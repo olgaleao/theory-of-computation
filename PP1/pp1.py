@@ -49,7 +49,6 @@ class Fiscalizacao:
 
         return a[-2]==v1 and a[-1]==v2
 
-
     def verificarCPF(self, cpf):
         match = re.search(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$', cpf)
         return match != None and self.validarCPF(cpf)
@@ -62,7 +61,7 @@ class Fiscalizacao:
         return self.verificarCPF(self.id_cliente)
 
     def verificarIdEmpresa(self):
-        if len(self.id_empresa) == 15:
+        if len(self.id_empresa) == 14:
             return self.verificarCPF(self.id_empresa)
         else:
             return self.verificarCNPJ(self.id_empresa)
