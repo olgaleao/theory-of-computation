@@ -78,7 +78,7 @@ class Fiscalizacao:
         return match != None
 
     def verificarCodigo(self):
-        match = re.search(r'', self.cod_transacao)
+        match = re.search(r'^\d{9}-([0-9a-z])(?!\1)([0-9a-z])(?!\1|\2)([0-9a-z])(?!\1|\2|\3)([0-9a-z])(?!\1|\2|\3|\4)([0-9a-z])-([02468]{3})(-[01]{3})?$', self.cod_transacao)
         return match != None
 
     def displayIdCliente(self):
@@ -99,11 +99,8 @@ class Fiscalizacao:
     def displayPrecoTransacao(self):
         print(self.preco_transacao)
 
-
-#lENDO A ENTRADA
-nota_fiscal = Fiscalizacao(*[x for x in input().split()])
-
-print(nota_fiscal.verificarIdCliente())
-print(nota_fiscal.verificarIdEmpresa())
-print(nota_fiscal.verificarData())
-print(nota_fiscal.verificarPrecos())
+try:
+    nota_fiscal = Fiscalizacao(*[x for x in input().split()])
+    print(nota_fiscal.verificarIdCliente() and nota_fiscal.verificarIdEmpresa() and nota_fiscal.verificarData() and nota_fiscal.verificarPrecos() and nota_fiscal.verificarCodigo())
+except EOFError:
+    print(True)
