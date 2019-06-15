@@ -1,88 +1,50 @@
-class Automato:
+import sys
 
-    def __init__(self, dict):
-        self.estados = dict['estados']
-        self.estado_inicial = dict['inicial']
-        self.estados_finais = sorted(dict['final'])
-        self.delta = dict['delta']
-        self.delta = self.ordena_delta()
-        self.pi, self.eta = [], []
-        self.letra_a, self.letra_b = [], []
-        self.criar_vetores_coluna()
-        self.pi = self.transpor_pi()
-        self.criar_alfabeto()
+class Stack:
+    def __init__(self):
+        self.items = ['$']
 
-    def criar_vetores_coluna(self):
-        for i in range(self.estados):
-            pi_temp, eta_temp = [], []
-            if(i == self.estado_inicial):
-                pi_temp.append(1)
-            else:
-                pi_temp.append(0)
-            if(i in self.estados_finais):
-                eta_temp.append(1)
-            else:
-                eta_temp.append(0)
-            self.eta.append(eta_temp)
-            self.pi.append(pi_temp)
+    def pop(self):
+        return self.items.pop()
 
-    def ordena_delta(self):
-        m = self.delta
-        for i in range(len(self.delta)):
-            m[i].sort()
-        return m
+    def push(self, newitem):
+        self.items.append(newitem)
 
-    def transpor_pi(self):
-        m = []
-        m.append([self.pi[i][0] for i in range(len(self.pi))])
-        return m
+    def top(self):
+        return self.items[len(self.items)-1]
 
-    def criar_alfabeto(self):
-        for i in range(self.estados):
-            letraA_temp, letraB_temp = [], []
-            for j in range(self.estados):
-                letraA_temp.append(0)
-                letraB_temp.append(0)
-            self.letra_a.append(letraA_temp)
-            self.letra_b.append(letraB_temp)
+    def is_empty(self):
+        return self.items == ['$']
+    
+def solve(st, line):
+    line_empty = all(s == ' ' for s in line)
+    if line_empty:
+        return True
 
-        for i in range(self.estados):
-            self.letra_a[i][self.delta[i][0]] = 1
-            self.letra_b[i][self.delta[i][1]] = 1
+    for i in line:
+        if i == '{' or i == '(' or i == '[':
+            st.push(i)
+        elif i == '}' and st.top() == '{':
+            st.pop()
+        elif i == ')' and st.top() == '(':
+            st.pop()
+        elif i == ']' and st.top() == '[':
+            st.pop()
+        elif i != ' ':
+            return False
 
-    def multiplicacao_matrizes(self, f, s):
-        n_linha, n_coluna = len(f), len(s[0])
-        prod = []
-        for i in range(n_linha):
-            linha = []
-            for j in range(n_coluna):
-                ans = 0
-                for k in range(len(s)):
-                    x = f[i][k]
-                    y = s[k][j]
-                    ans += x*y
-                linha.append(ans)
-            prod.append(linha)
-        return prod
+    return st.is_empty()
 
-#lendo a entrada
-dict = Automato(eval(input()))
-n = int(input())
-for i in range(n):
-    s = input()
-    if s[0] is 'a':
-        ans = dict.multiplicacao_matrizes(dict.pi, dict.letra_a)
-    elif s[0] is 'b':
-        ans = dict.multiplicacao_matrizes(dict.pi, dict.letra_b)
-
-    for j in range(1, len(s)):
-        if s[j] is 'a':
-            ans = dict.multiplicacao_matrizes(ans, dict.letra_a)
-        elif s[j] is 'b':
-            ans = dict.multiplicacao_matrizes(ans, dict.letra_b)
-
-    ans = dict.multiplicacao_matrizes(ans, dict.eta)
-    if(ans[0][0] == 1):
-        print("ACEITA")
-    else:
-        print("REJEITA")
+def main():
+    full_line = ''
+    for line in sys.stdin:
+        line = line.splitlines()[0]
+        if line == '':
+            break
+        st = Stack()
+        full_line += line
+        print(solve(st, line))
+    print(solve(st, full_line))
+    
+if __name__ == '__main__':
+    main()
